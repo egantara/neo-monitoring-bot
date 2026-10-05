@@ -13,6 +13,11 @@ const dateInput =
     "date-input"
   );
 
+const selectedDateEl =
+  document.getElementById(
+    "selected-date"
+  );
+
 const addDateBtn =
   document.getElementById(
     "add-date"
@@ -61,43 +66,18 @@ let selectedFile = null;
 // INIT
 // ======================
 
-function parseDMY(value) {
-  const parts = String(
-    value || ""
-  )
-    .trim()
-    .split("/");
+function formatDate(
+  value
+) {
+  const [year, month, day] =
+    String(value || "").split(
+      "-"
+    );
 
   if (
-    parts.length !== 3
-  ) {
-    return null;
-  }
-
-  const [day, month, year] =
-    parts;
-
-  if (
-    !/^\d{2}$/.test(day) ||
-    !/^\d{2}$/.test(month) ||
-    !/^\d{4}$/.test(year)
-  ) {
-    return null;
-  }
-
-  const date = new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day)
-  );
-
-  if (
-    date.getFullYear() !==
-      Number(year) ||
-    date.getMonth() !==
-      Number(month) - 1 ||
-    date.getDate() !==
-      Number(day)
+    !year ||
+    !month ||
+    !day
   ) {
     return null;
   }
@@ -105,7 +85,7 @@ function parseDMY(value) {
   return `${day}/${month}/${year}`;
 }
 
-function todayDMY() {
+function todayISO() {
   const now = new Date();
 
   const day = String(
@@ -116,7 +96,19 @@ function todayDMY() {
     now.getMonth() + 1
   ).padStart(2, "0");
 
-  return `${day}/${month}/${now.getFullYear()}`;
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+function updateSelected() {
+  const formatted =
+    formatDate(
+      dateInput.value
+    );
+
+  selectedDateEl.textContent =
+    formatted
+      ? `Tanggal terpilih: ${formatted}`
+      : "";
 }
 
 function renderChips() {
@@ -170,13 +162,13 @@ function renderChips() {
 
 function addDate() {
   const formatted =
-    parseDMY(
+    formatDate(
       dateInput.value
     );
 
   if (!formatted) {
     addLog(
-      "Format tanggal harus DD/MM/YYYY"
+      "Tanggal belum dipilih"
     );
 
     return;
@@ -306,65 +298,9 @@ dropzone.addEventListener(
 );
 
 dateInput.addEventListener(
-  "input",
-  () => {
-    const digits =
-      dateInput.value
-        .replace(/\D/g, "")
-        .slice(0, 8);
-
-    if (
-      digits.length > 4
-    ) {
-      dateInput.value = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-    } else if (
-      digits.length > 2
-    ) {
-      dateInput.value = `${digits.slice(0, 2)}/${digits.slice(2)}`;
-    } else {
-      dateInput.value =
-        digits;
-    }
-
-    const synced =
-      parseDMY(
-        dateInput.value
-      );
-
-    if (synced) {
-      const [
-        day,
-        month,
-        year,
-      ] = synced.split("/");
-
-      dateNative.value = `${year}-${month}-${day}`;
-    }
-  }
-);
-
-const dateNative =
-  document.getElementById(
-    "date-native"
-  );
-
-dateNative.addEventListener(
   "change",
   () => {
-    const [year, month, day] =
-      String(
-        dateNative.value || ""
-      ).split("-");
-
-    if (
-      !year ||
-      !month ||
-      !day
-    ) {
-      return;
-    }
-
-    dateInput.value = `${day}/${month}/${year}`;
+    updateSelected();
   }
 );
 
@@ -628,11 +564,9 @@ form.addEventListener(
   }
 );
 
-dateInput.value = todayDMY();
+dateInput.value = todayISO();
 
-dateInput.dispatchEvent(
-  new Event("input")
-);
+updateSelected();
 
 dateInput.addEventListener(
   "keydown",

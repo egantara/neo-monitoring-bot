@@ -27,20 +27,10 @@
         <div class="field">
           <label for="date-input">Tanggal laporan (DD/MM/YYYY)</label>
           <div class="date-row">
-            <input
-              type="text"
-              id="date-input"
-              placeholder="DD/MM/YYYY"
-              inputmode="numeric"
-              maxlength="10"
-              autocomplete="off"
-            />
-            <div class="date-native-wrap">
-              <button type="button" class="btn secondary" tabindex="-1" aria-hidden="true">📅</button>
-              <input type="date" id="date-native" />
-            </div>
+            <input type="date" id="date-input" />
             <button type="button" id="add-date" class="btn secondary">Tambah</button>
           </div>
+          <p id="selected-date" class="file-name"></p>
           <div id="date-chips" class="chips"></div>
         </div>
 
