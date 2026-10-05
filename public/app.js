@@ -61,18 +61,43 @@ let selectedFile = null;
 // INIT
 // ======================
 
-function formatDate(
-  value
-) {
-  const [year, month, day] =
-    String(value || "").split(
-      "-"
-    );
+function parseDMY(value) {
+  const parts = String(
+    value || ""
+  )
+    .trim()
+    .split("/");
 
   if (
-    !year ||
-    !month ||
-    !day
+    parts.length !== 3
+  ) {
+    return null;
+  }
+
+  const [day, month, year] =
+    parts;
+
+  if (
+    !/^\d{2}$/.test(day) ||
+    !/^\d{2}$/.test(month) ||
+    !/^\d{4}$/.test(year)
+  ) {
+    return null;
+  }
+
+  const date = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day)
+  );
+
+  if (
+    date.getFullYear() !==
+      Number(year) ||
+    date.getMonth() !==
+      Number(month) - 1 ||
+    date.getDate() !==
+      Number(day)
   ) {
     return null;
   }
@@ -80,7 +105,7 @@ function formatDate(
   return `${day}/${month}/${year}`;
 }
 
-function todayISO() {
+function todayDMY() {
   const now = new Date();
 
   const day = String(
@@ -91,7 +116,7 @@ function todayISO() {
     now.getMonth() + 1
   ).padStart(2, "0");
 
-  return `${now.getFullYear()}-${month}-${day}`;
+  return `${day}/${month}/${now.getFullYear()}`;
 }
 
 function renderChips() {
@@ -145,13 +170,13 @@ function renderChips() {
 
 function addDate() {
   const formatted =
-    formatDate(
+    parseDMY(
       dateInput.value
     );
 
   if (!formatted) {
     addLog(
-      "Tanggal belum dipilih"
+      "Format tanggal harus DD/MM/YYYY"
     );
 
     return;
@@ -277,6 +302,29 @@ dropzone.addEventListener(
       event.dataTransfer
         ?.files?.[0]
     );
+  }
+);
+
+dateInput.addEventListener(
+  "input",
+  () => {
+    const digits =
+      dateInput.value
+        .replace(/\D/g, "")
+        .slice(0, 8);
+
+    if (
+      digits.length > 4
+    ) {
+      dateInput.value = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    } else if (
+      digits.length > 2
+    ) {
+      dateInput.value = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    } else {
+      dateInput.value =
+        digits;
+    }
   }
 );
 
@@ -540,7 +588,20 @@ form.addEventListener(
   }
 );
 
-dateInput.value = todayISO();
+dateInput.value = todayDMY();
+
+dateInput.addEventListener(
+  "keydown",
+  (event) => {
+    if (
+      event.key === "Enter"
+    ) {
+      event.preventDefault();
+
+      addDate();
+    }
+  }
+);
 
 addDate();
 

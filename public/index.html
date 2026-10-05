@@ -27,7 +27,14 @@
         <div class="field">
           <label for="date-input">Tanggal laporan (DD/MM/YYYY)</label>
           <div class="date-row">
-            <input type="date" id="date-input" />
+            <input
+              type="text"
+              id="date-input"
+              placeholder="DD/MM/YYYY"
+              inputmode="numeric"
+              maxlength="10"
+              autocomplete="off"
+            />
             <button type="button" id="add-date" class="btn secondary">Tambah</button>
           </div>
           <div id="date-chips" class="chips"></div>
