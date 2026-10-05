@@ -90,20 +90,6 @@ function formatDate(
   return `${day}/${month}/${year}`;
 }
 
-function todayISO() {
-  const now = new Date();
-
-  const day = String(
-    now.getDate()
-  ).padStart(2, "0");
-
-  const month = String(
-    now.getMonth() + 1
-  ).padStart(2, "0");
-
-  return `${now.getFullYear()}-${month}-${day}`;
-}
-
 function updateSelected() {
   const formatted =
     formatDate(
@@ -112,7 +98,7 @@ function updateSelected() {
 
   selectedDateEl.textContent =
     formatted
-      ? `Tanggal terpilih: ${formatted}`
+      ? "Tanggal terpilih"
       : "";
 }
 
@@ -440,7 +426,7 @@ form.addEventListener(
   }
 );
 
-dateInput.value = todayISO();
+dateInput.value = "";
 
 updateSelected();
 
