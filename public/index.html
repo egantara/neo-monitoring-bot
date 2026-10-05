@@ -43,19 +43,12 @@
           <p id="file-name" class="file-name"></p>
         </div>
 
-        <button type="submit" id="submit-btn" class="btn primary">Preview</button>
+        <div class="actions">
+          <button type="submit" id="submit-btn" class="btn primary">Preview</button>
+          <button type="button" id="write-sheet" class="btn secondary" disabled>Submit</button>
+          <span id="write-status" class="write-status"></span>
+        </div>
       </form>
-    </section>
-
-    <section class="card">
-      <h2>Hasil</h2>
-      <div id="result">
-        <p class="muted">Belum ada hasil. Isi form lalu tekan Preview.</p>
-      </div>
-      <div id="write-actions" class="write-actions" hidden>
-        <button type="button" id="write-sheet" class="btn secondary">✍️ Tulis ke Google Sheet</button>
-        <span id="write-status" class="write-status"></span>
-      </div>
     </section>
 
     <section class="card">

@@ -48,16 +48,6 @@ const submitBtn =
     "submit-btn"
   );
 
-const resultEl =
-  document.getElementById(
-    "result"
-  );
-
-const writeActions =
-  document.getElementById(
-    "write-actions"
-  );
-
 const writeBtn =
   document.getElementById(
     "write-sheet"
@@ -325,175 +315,6 @@ addDateBtn.addEventListener(
 );
 
 // ======================
-// RENDER RESULT
-// ======================
-
-const METRIC_COLUMNS =
-  [
-    {
-      key: "totalReach",
-      label: "Reach",
-    },
-    {
-      key: "totalEngagement",
-      label: "Engagement",
-    },
-    {
-      key: "totalImpressions",
-      label: "Impressions",
-    },
-    {
-      key: "videoViews",
-      label: "Video Views",
-    },
-    {
-      key: "avgER",
-      label: "ER",
-    },
-  ];
-
-function formatNumber(
-  value
-) {
-  return typeof value ===
-    "number"
-    ? value.toLocaleString(
-        "id-ID"
-      )
-    : value;
-}
-
-function renderResult(payload) {
-  resultEl.innerHTML = "";
-
-  const result =
-    payload.result || {};
-
-  const datesKey =
-    Object.keys(result);
-
-  if (
-    datesKey.length === 0
-  ) {
-    resultEl.innerHTML =
-      '<p class="muted">Tidak ada data sesuai periode report.</p>';
-
-    return;
-  }
-
-  for (
-    const date of datesKey
-  ) {
-    const brands =
-      result[date] || {};
-
-    const block =
-      document.createElement(
-        "div"
-      );
-
-    block.className =
-      "result-block";
-
-    const title =
-      document.createElement(
-        "h3"
-      );
-
-    title.textContent = `📅 ${date}`;
-
-    block.append(title);
-
-    const table =
-      document.createElement(
-        "table"
-      );
-
-    const head =
-      document.createElement(
-        "thead"
-      );
-
-    const headRow =
-      document.createElement(
-        "tr"
-      );
-
-    [
-      "Brand",
-      ...METRIC_COLUMNS.map(
-        (column) =>
-          column.label
-      ),
-    ].forEach((label) => {
-      const th =
-        document.createElement(
-          "th"
-        );
-
-      th.textContent = label;
-
-      headRow.append(th);
-    });
-
-    head.append(headRow);
-
-    table.append(head);
-
-    const body =
-      document.createElement(
-        "tbody"
-      );
-
-    for (
-      const brand in brands
-    ) {
-      const data =
-        brands[brand];
-
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-      const brandCell =
-        document.createElement(
-          "td"
-        );
-
-      brandCell.textContent =
-        brand;
-
-      row.append(brandCell);
-
-      for (
-        const column of METRIC_COLUMNS
-      ) {
-        const cell =
-          document.createElement(
-            "td"
-          );
-
-        cell.textContent =
-          formatNumber(
-            data[column.key]
-          );
-
-        row.append(cell);
-      }
-
-      body.append(row);
-    }
-
-    table.append(body);
-
-    block.append(table);
-
-    resultEl.append(block);
-  }
-}
-
-// ======================
 // SUBMIT
 // ======================
 
@@ -524,6 +345,14 @@ form.addEventListener(
 
     submitBtn.textContent =
       "Memproses...";
+
+    writeBtn.disabled = true;
+
+    writeStatus.textContent =
+      "";
+
+    writeStatus.className =
+      "write-status";
 
     try {
       const csv =
@@ -561,8 +390,6 @@ form.addEventListener(
         );
       }
 
-      renderResult(payload);
-
       if (
         payload.brandCount > 0
       ) {
@@ -573,7 +400,7 @@ form.addEventListener(
           dates: [...dates],
         };
 
-        writeActions.hidden =
+        writeBtn.disabled =
           false;
 
         writeStatus.textContent =
@@ -581,22 +408,24 @@ form.addEventListener(
 
         writeStatus.className =
           "write-status";
+
+        addLog(
+          `✅ ${payload.platform} • ${dates.length} tanggal • ${payload.brandCount} brand`
+        );
       } else {
         lastPreview = null;
 
-        writeActions.hidden =
+        writeBtn.disabled =
           true;
+
+        addLog(
+          `⚠️ ${payload.message || "Tidak ada data sesuai periode report."}`
+        );
       }
-
-      addLog(
-        `✅ ${payload.platform} • ${dates.length} tanggal • ${payload.brandCount} brand`
-      );
     } catch (error) {
-      resultEl.innerHTML = `<p class="error">❌ ${error.message}</p>`;
-
       lastPreview = null;
 
-      writeActions.hidden =
+      writeBtn.disabled =
         true;
 
       addLog(
@@ -711,7 +540,7 @@ writeBtn.addEventListener(
         false;
 
       writeBtn.textContent =
-        "✍️ Tulis ke Google Sheet";
+        "Submit";
     }
   }
 );
