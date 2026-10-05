@@ -398,6 +398,22 @@ form.addEventListener(
         addLog(
           `✅ ${payload.platform} • ${dates.length} tanggal • ${payload.brandCount} brand`
         );
+
+        const brandList =
+          [
+            ...new Set(
+              Object.values(
+                payload.result || {}
+              ).flatMap(
+                (brands) =>
+                  Object.keys(brands)
+              )
+            ),
+          ];
+
+        addLog(
+          `Brands: ${brandList.join(", ")}`
+        );
       } else {
         lastPreview = null;
 
