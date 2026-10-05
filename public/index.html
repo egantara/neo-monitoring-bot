@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEO Daily Monitoring — Preview CSV</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>NEO Daily Monitoring</h1>
+      <p>Preview hasil proses CSV sebelum update Google Sheet</p>
+    </header>
+
+    <section class="card">
+      <form id="preview-form">
+        <div class="field">
+          <label for="platform">Platform</label>
+          <select id="platform" name="platform" required>
+            <option value="IG">Instagram (IG)</option>
+            <option value="FB">Facebook (FB)</option>
+            <option value="TT">TikTok (TT)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="date-input">Tanggal laporan (DD/MM/YYYY)</label>
+          <div class="date-row">
+            <input type="date" id="date-input" />
+            <button type="button" id="add-date" class="btn secondary">Tambah</button>
+          </div>
+          <div id="date-chips" class="chips"></div>
+        </div>
+
+        <div class="field">
+          <label for="csv-file">File CSV</label>
+          <div id="dropzone" class="dropzone">
+            <input type="file" id="csv-file" accept=".csv,text/csv" />
+            <p>Drag &amp; drop file CSV ke sini atau klik untuk memilih</p>
+          </div>
+          <p id="file-name" class="file-name"></p>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn primary">Preview</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Hasil</h2>
+      <div id="result">
+        <p class="muted">Belum ada hasil. Isi form lalu tekan Preview.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Log sesi</h2>
+      <ul id="log" class="log"></ul>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
