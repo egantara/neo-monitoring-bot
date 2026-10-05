@@ -325,6 +325,46 @@ dateInput.addEventListener(
       dateInput.value =
         digits;
     }
+
+    const synced =
+      parseDMY(
+        dateInput.value
+      );
+
+    if (synced) {
+      const [
+        day,
+        month,
+        year,
+      ] = synced.split("/");
+
+      dateNative.value = `${year}-${month}-${day}`;
+    }
+  }
+);
+
+const dateNative =
+  document.getElementById(
+    "date-native"
+  );
+
+dateNative.addEventListener(
+  "change",
+  () => {
+    const [year, month, day] =
+      String(
+        dateNative.value || ""
+      ).split("-");
+
+    if (
+      !year ||
+      !month ||
+      !day
+    ) {
+      return;
+    }
+
+    dateInput.value = `${day}/${month}/${year}`;
   }
 );
 
@@ -589,6 +629,10 @@ form.addEventListener(
 );
 
 dateInput.value = todayDMY();
+
+dateInput.dispatchEvent(
+  new Event("input")
+);
 
 dateInput.addEventListener(
   "keydown",
