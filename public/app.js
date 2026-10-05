@@ -53,6 +53,21 @@ const resultEl =
     "result"
   );
 
+const writeActions =
+  document.getElementById(
+    "write-actions"
+  );
+
+const writeBtn =
+  document.getElementById(
+    "write-sheet"
+  );
+
+const writeStatus =
+  document.getElementById(
+    "write-status"
+  );
+
 const logEl =
   document.getElementById(
     "log"
@@ -482,6 +497,8 @@ function renderResult(payload) {
 // SUBMIT
 // ======================
 
+let lastPreview = null;
+
 form.addEventListener(
   "submit",
   async (event) => {
@@ -546,11 +563,41 @@ form.addEventListener(
 
       renderResult(payload);
 
+      if (
+        payload.brandCount > 0
+      ) {
+        lastPreview = {
+          csv,
+          platform:
+            platformSelect.value,
+          dates: [...dates],
+        };
+
+        writeActions.hidden =
+          false;
+
+        writeStatus.textContent =
+          "";
+
+        writeStatus.className =
+          "write-status";
+      } else {
+        lastPreview = null;
+
+        writeActions.hidden =
+          true;
+      }
+
       addLog(
         `✅ ${payload.platform} • ${dates.length} tanggal • ${payload.brandCount} brand`
       );
     } catch (error) {
       resultEl.innerHTML = `<p class="error">❌ ${error.message}</p>`;
+
+      lastPreview = null;
+
+      writeActions.hidden =
+        true;
 
       addLog(
         `❌ ${error.message}`
@@ -567,6 +614,107 @@ form.addEventListener(
 dateInput.value = todayISO();
 
 updateSelected();
+
+// ======================
+// WRITE TO SHEET
+// ======================
+
+writeBtn.addEventListener(
+  "click",
+  async () => {
+    if (!lastPreview) {
+      addLog(
+        "Gagal: belum ada hasil preview"
+      );
+
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        `Tulis ke Google Sheet?\n\nPlatform: ${lastPreview.platform}\nTanggal: ${lastPreview.dates.join(", ")}\n\nSel tanggal terpilih akan ditimpa.`
+      );
+
+    if (!confirmed) {
+      addLog(
+        "Tulis ke Sheet dibatalkan"
+      );
+
+      return;
+    }
+
+    writeBtn.disabled = true;
+
+    writeBtn.textContent =
+      "Menulis...";
+
+    writeStatus.textContent =
+      "";
+
+    writeStatus.className =
+      "write-status";
+
+    try {
+      const response =
+        await fetch(
+          "/api/write",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify(
+              lastPreview
+            ),
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (
+        !response.ok
+      ) {
+        throw new Error(
+          payload.error ||
+            "Permintaan gagal"
+        );
+      }
+
+      if (!payload.ok) {
+        throw new Error(
+          payload.message ||
+            "Tidak ada data untuk ditulis"
+        );
+      }
+
+      writeStatus.textContent = `✅ ${payload.updatedCells} sel • ${payload.brandCount} brand • ${payload.dates.join(", ")}`;
+
+      writeStatus.className =
+        "write-status ok";
+
+      addLog(
+        `✍️ Sheet terupdate: ${payload.updatedCells} sel • ${payload.brandCount} brand • ${payload.dates.join(", ")}`
+      );
+    } catch (error) {
+      writeStatus.textContent = `❌ ${error.message}`;
+
+      writeStatus.className =
+        "write-status err";
+
+      addLog(
+        `❌ Tulis sheet: ${error.message}`
+      );
+    } finally {
+      writeBtn.disabled =
+        false;
+
+      writeBtn.textContent =
+        "✍️ Tulis ke Google Sheet";
+    }
+  }
+);
 
 dateInput.addEventListener(
   "keydown",

@@ -148,6 +148,31 @@ input[type="date"] {
   color: #1f2933;
 }
 
+.btn.secondary:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.write-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.write-status {
+  font-size: 13px;
+}
+
+.write-status.ok {
+  color: #047857;
+}
+
+.write-status.err {
+  color: #b91c1c;
+}
+
 .muted {
   color: #6b7280;
   font-size: 14px;
